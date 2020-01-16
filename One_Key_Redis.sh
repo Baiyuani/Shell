@@ -1,7 +1,7 @@
 #!/bin/bash
 # Need SSH password free login required
 # Configure yum is YES
-# Redis of .tar place to /root/redis/
+# redis-4.0.8.tar.gz place to /root/redis/
 
 GCC (){
 for i in {51..59}
