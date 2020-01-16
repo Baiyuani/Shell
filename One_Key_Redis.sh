@@ -4,7 +4,7 @@
 # Redis of .tar place to /root/redis/
 
 GCC (){
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i yum -y install gcc &> /dev/null
 	if [ $? -eq 0 ] ;then
@@ -16,7 +16,7 @@ done
 }
 
 TAR_REDIS (){
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i tar -xf /root/redis/redis-4.0.8.tar.gz -C /root
 	if [ $? -eq 0 ] ;then
@@ -28,7 +28,7 @@ done
 }
 
 MAKE (){
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i make -f /root/redis-4.0.8/Makefile
 	if [ $? -eq 0 ] ;then
@@ -40,9 +40,9 @@ done
 }
 
 MAKE_INSTALL (){
-for i in {51..56}
+for i in {51..59}
 do
-	ssh 192.168.4.$i make install
+	ssh 192.168.4.$i make install -C /root/redis-4.0.8
 	if [ $? -eq 0 ] ;then
 		echo "MAKE_INSTALL$i YES"
 	else
@@ -52,7 +52,7 @@ done
 }
 
 INIT (){
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i /root/redis-4.0.8/utils/install_server.sh<<EOF
 
@@ -73,7 +73,7 @@ done
 }
 
 PORT () {
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i sed -ri "93s/6379/63$i/" /etc/redis/6379.conf
 	if [ $? -eq 0 ] ;then
@@ -85,7 +85,7 @@ done
 }
 
 BIND () {
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i sed -ri "70s/127.0.0.1/192.168.4.$i/" /etc/redis/6379.conf
 	if [ $? -eq 0 ] ;then
@@ -97,9 +97,10 @@ done
 }
 
 RESTART () {
-for i in {51..56}
+for i in {51..59}
 do
-	ssh 192.168.4.$i /etc/init.d/redis_6379 restart
+	ssh 192.168.4.$i "redis-cli -h 192.168.4.$i -p 63$i shutdown"
+        ssh 192.168.4.$i "redis-server /etc/redis/6379.conf"
 	if [ $? -eq 0 ] ;then
 		echo "RESTART$i YES"
 	else
@@ -109,7 +110,7 @@ done
 }
 
 CHECK () {
-for i in {51..56}
+for i in {51..59}
 do
 	ssh 192.168.4.$i ss -antup |grep :63
 done
