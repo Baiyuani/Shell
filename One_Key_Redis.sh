@@ -30,7 +30,7 @@ done
 MAKE (){
 for i in {51..59}
 do
-	ssh 192.168.4.$i make -f /root/redis-4.0.8/Makefile
+	ssh 192.168.4.$i make -C /root/redis-4.0.8
 	if [ $? -eq 0 ] ;then
 		echo "MAKE$i YES"
 	else
