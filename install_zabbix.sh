@@ -95,6 +95,7 @@ AGENTAC () {
 	sed -ri '280s/0/1/' $confa
 	useradd zabbix
 	zabbix_agentd
+	sleep 0.5
 	ps -C zabbix_agentd
 	echo "
 
