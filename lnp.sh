@@ -31,18 +31,14 @@ sed -ri '/worker_connections/s/1024/65536/' $confd
 sed -ri '/default_type/a server_tokens off;' $confd
 echo '
 [Unit]
-Description=nginx - high performance web server
-Documentation=http://nginx.org/en/docs/
+Description=The Nginx HTTP Server
 After=network.target remote-fs.target nss-lookup.target
 
 [Service]
 Type=forking
-PIDFile=/var/run/nginx.pid
-ExecStartPre=/usr/local/nginx/sbin/nginx -t -c /usr/local/nginx/conf/nginx.conf
-ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+ExecStart=/usr/local/nginx/sbin/nginx
 ExecReload=/usr/local/nginx/sbin/nginx -s reload
-ExecStop=/usr/local/nginx/sbin/nginx -s quit
-PrivateTmp=true
+ExecStop=/usr/local/nginx/sbin/nginx -s stop
 
 [Install]
 WantedBy=multi-user.target ' > /usr/lib/systemd/system/nginx.service
