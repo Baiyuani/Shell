@@ -29,17 +29,23 @@ sed -ri '/fastcgi_params/s/_params/.conf/' $confd
 sed -ri '/worker_processes/s/1/2/' $confd
 sed -ri '/worker_connections/s/1024/65536/' $confd
 sed -ri '/default_type/a server_tokens off;' $confd
-echo "
+echo '
 [Unit]
-Description=The Nginx HTTP Server
+Description=nginx - high performance web server
+Documentation=http://nginx.org/en/docs/
 After=network.target remote-fs.target nss-lookup.target
+
 [Service]
 Type=forking
-ExecStart=/usr/local/nginx/sbin/nginx
+PIDFile=/var/run/nginx.pid
+ExecStartPre=/usr/local/nginx/sbin/nginx -t -c /usr/local/nginx/conf/nginx.conf
+ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
 ExecReload=/usr/local/nginx/sbin/nginx -s reload
-ExecStop=/bin/kill -s QUIT \${MAINPID}
+ExecStop=/usr/local/nginx/sbin/nginx -s quit
+PrivateTmp=true
+
 [Install]
-WantedBy=multi-user.target " > /usr/lib/systemd/system/nginx.service
+WantedBy=multi-user.target ' > /usr/lib/systemd/system/nginx.service
 systemctl daemon-reload
 systemctl restart nginx
 systemctl enable nginx
