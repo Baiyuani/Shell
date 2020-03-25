@@ -2,11 +2,11 @@
 # 
 SERVER () {
 	yum -y install gcc pcre-devel zlib-devel openssl-devel
-	tar -xf /root/Zabbix/nginx-1.12.2.tar.gz 
-	cd /root/Zabbix/nginx-1.12.2/
+	tar -xf /root/Zabbix/nginx-1.12.2.tar.gz -C /root
+	cd /root/nginx-1.12.2/
 	./configure --with-http_ssl_module
-	make -C /root/Zabbix/nginx-1.12.2/
-	make install -C /root/Zabbix/nginx-1.12.2/
+	make -C /root/nginx-1.12.2/
+	make install -C /root/nginx-1.12.2/
 	yum -y install php php-fpm php-mysql mariadb mariadb-server mariadb-devel
 	sed -ri "23i fastcgi_read_timeout 300;" /usr/local/nginx/conf/nginx.conf
 	sed -ri "23i fastcgi_send_timeout 300;" /usr/local/nginx/conf/nginx.conf
@@ -14,8 +14,8 @@ SERVER () {
 	sed -ri "23i fastcgi_buffer_size 32k;" /usr/local/nginx/conf/nginx.conf
 	sed -ri "23i fastcgi_buffers 8 16k;" /usr/local/nginx/conf/nginx.conf
 	sed -ri "/index/s/index\.html/index\.php/" /usr/local/nginx/conf/nginx.conf
-	sed -ri "69,75s/#//" /usr/local/nginx/conf/nginx.conf
-	sed -ri "73s/^/#/" /usr/local/nginx/conf/nginx.conf
+	sed -ri "70,76s/#//" /usr/local/nginx/conf/nginx.conf
+	sed -ri "74s/^/#/" /usr/local/nginx/conf/nginx.conf
 	sed -ri "/fastcgi_params/s/_params/\.conf/" /usr/local/nginx/conf/nginx.conf
 	systemctl start php-fpm mariadb
 	systemctl enable php-fpm mariadb
@@ -48,9 +48,8 @@ SERVER () {
 	sed -ri '119s/$/zabbix/' $confd
 	useradd zabbix
 	zabbix_server
-	netstat -lntup |grep 10051
-	sleep 3
 }
+
 AGENT () {
 	read -p 'Input zabbix_server IP:' SIP
 	read -p 'Input zabbix_server port:(if use default port then ENTER)' SPORT
@@ -69,8 +68,8 @@ AGENT () {
 	sed -ri '280s/0/1/' $confa
 	useradd zabbix
 	zabbix_agentd
+    sleep 1
 	ss -lntup |grep 10050
-	sleep 3
 }
 
 AGENTAC () {
@@ -95,7 +94,7 @@ AGENTAC () {
 	sed -ri '280s/0/1/' $confa
 	useradd zabbix
 	zabbix_agentd
-	sleep 0.5
+	sleep 1
 	ps -C zabbix_agentd
 	echo "
 
